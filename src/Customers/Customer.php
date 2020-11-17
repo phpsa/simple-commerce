@@ -23,7 +23,7 @@ class Customer
 
     public function save()
     {
-        $this->save();
+        $this->entry->save();
 
         return $this;
     }
