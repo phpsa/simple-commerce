@@ -96,7 +96,7 @@ class CheckoutController extends BaseActionController
             $customer->save();
 
             $this->cart->update([
-                'customer' => $customer->id,
+                'customer' => $customer->id(),
             ]);
         }
 
