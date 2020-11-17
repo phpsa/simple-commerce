@@ -17,7 +17,7 @@ class CartCompleted
                 try {
                     $customer = Customer::find($event->cart->get('customer'));
 
-                    Mail::to($customer->data['email'])
+                    Mail::to($customer->get('email'))
                         ->send(new OrderConfirmation($event->cart->id()));
                 } catch (\Exception $e) {
                     // Do nothing

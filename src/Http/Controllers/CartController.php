@@ -48,19 +48,21 @@ class CartController extends BaseActionController
                 }
             } catch (CustomerNotFound $e) {
                 $customer = Customer::make()
-                    ->data([
-                        'name'  => isset($data['customer']['name']) ? $data['customer']['name'] : '',
-                        'email' => $data['customer']['email'],
-                    ])
+                    ->set('name', isset($data['customer']['name']) ? $data['customer']['name'] : '')
+                    ->set('email', $data['customer']['email'])
                     ->save();
             }
 
             if (is_array($data['customer'])) {
-                $customer->update($data['customer']);
+                foreach ($data['customer'] as $key => $value) {
+                    $customer->set($key, $value);
+                }
+
+                $customer->save();
             }
 
             $cart->update([
-                'customer' => $customer->id,
+                'customer' => $customer->id(),
             ]);
 
             unset($data['customer']);
@@ -68,14 +70,12 @@ class CartController extends BaseActionController
 
         if (isset($data['email'])) {
             $customer = Customer::make()
-                ->data([
-                    'name' => isset($data['name']) ? $data['name'] : '',
-                    'email' => $data['email'],
-                ])
+                ->set('name', isset($data['name']) ? $data['name'] : '')
+                ->set('email', $data['email'])
                 ->save();
 
             $cart->update([
-                'customer' => $customer->id,
+                'customer' => $customer->id(),
             ]);
 
             unset($data['name']);

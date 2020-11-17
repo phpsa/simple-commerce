@@ -47,14 +47,11 @@ class StripeGateway extends BaseGateway implements Gateway
             $customer = Customer::find($cart->data['customer']);
         }
 
-        if (isset($customer->data['email'])) {
+        if ($customer->has('email')) {
             $stripeCustomerData = [
-                'email' => $customer->data['email'],
+                'name' => $customer->has('name') ? $customer->get('name') : null,
+                'email' => $customer->get('email'),
             ];
-
-            if (isset($customer->data['name'])) {
-                $stripeCustomerData['name'] = $customer->data['name'];
-            }
 
             $stripeCustomer = StripeCustomer::create($stripeCustomerData);
             $intentData['customer'] = $stripeCustomer->id;

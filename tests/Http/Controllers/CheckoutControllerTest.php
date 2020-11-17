@@ -95,7 +95,7 @@ class CheckoutControllerTest extends TestCase
 
         // Assert customer has been created & set
         $customer = Customer::findByEmail($data['email']);
-        $this->assertSame($cart->data['customer'], $customer->id);
+        $this->assertSame($cart->data['customer'], $customer->id());
 
         // Assert gateway has run and data has been saved
         $this->assertStringContainsString('DummyGateway', $cart->data['gateway']);

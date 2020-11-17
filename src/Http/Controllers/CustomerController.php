@@ -11,13 +11,19 @@ class CustomerController extends BaseActionController
 {
     public function index(IndexRequest $request, $customer)
     {
-        return Customer::find($customer)->toArray();
+        return Customer::find($customer)->toAugmentedArray();
     }
 
     public function update(UpdateRequest $request, $customer)
     {
-        Customer::find($customer)
-            ->update(Arr::except($request->all(), ['_params', '_redirect', '_token']));
+        $customer = Customer::find($customer);
+        $data = Arr::except($request->all(), ['_params', '_redirect', '_token']);
+
+        foreach ($data as $key => $value) {
+            $customer->set($key, $value);
+        }
+
+        $customer->save();
 
         return $this->withSuccess($request);
     }

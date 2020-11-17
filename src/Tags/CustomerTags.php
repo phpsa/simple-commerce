@@ -12,7 +12,7 @@ class CustomerTags extends SubTag
 
     public function index()
     {
-        return Customer::find($this->params->get('id'))->entry()->toAugmentedArray();
+        return Customer::find($this->params->get('id'))->toAugmentedArray();
     }
 
     public function update()

@@ -2,9 +2,11 @@
 
 namespace DoubleThreeDigital\SimpleCommerce\Tests\Repositories;
 
+use DoubleThreeDigital\SimpleCommerce\Customers\Customer as CustomersCustomer;
 use DoubleThreeDigital\SimpleCommerce\Facades\Customer;
 use DoubleThreeDigital\SimpleCommerce\Repositories\CustomerRepository;
 use DoubleThreeDigital\SimpleCommerce\Tests\TestCase;
+use Statamic\Entries\Entry as EntriesEntry;
 use Statamic\Facades\Entry;
 
 class CustomerRepositoryTest extends TestCase
@@ -26,9 +28,9 @@ class CustomerRepositoryTest extends TestCase
 
         $customer = Customer::find($entry->id());
 
-        $this->assertSame($customer->title, 'Donald Duck <donald@example.com>');
-        $this->assertSame($customer->data['name'], 'Donald Duck');
-        $this->assertSame($customer->data['email'], 'donald@example.com');
+        $this->assertSame($customer->title(), 'Donald Duck <donald@example.com>');
+        $this->assertSame($customer->get('name'), 'Donald Duck');
+        $this->assertSame($customer->get('email'), 'donald@example.com');
     }
 
     /** @test */
@@ -49,11 +51,11 @@ class CustomerRepositoryTest extends TestCase
 
         $customer = Customer::find($entry->id());
 
-        $this->assertNotNull($customer->slug);
-        $this->assertSame($customer->slug, 'mickey-at-examplecom');
-        $this->assertSame($customer->title, 'Mickey Mouse <mickey@example.com>');
-        $this->assertSame($customer->data['name'], 'Mickey Mouse');
-        $this->assertSame($customer->data['email'], 'mickey@example.com');
+        $this->assertNotNull($customer->slug());
+        $this->assertSame($customer->slug(), 'mickey-at-examplecom');
+        $this->assertSame($customer->title(), 'Mickey Mouse <mickey@example.com>');
+        $this->assertSame($customer->get('name'), 'Mickey Mouse');
+        $this->assertSame($customer->get('email'), 'mickey@example.com');
     }
 
     /** @test */
@@ -71,33 +73,37 @@ class CustomerRepositoryTest extends TestCase
 
         $customer = Customer::findByEmail('minnie@example.com');
 
-        $this->assertSame($customer->title, 'Minnie Mouse <minnie@example.com>');
-        $this->assertSame($customer->data['name'], 'Minnie Mouse');
-        $this->assertSame($customer->data['email'], 'minnie@example.com');
+        $this->assertSame($customer->title(), 'Minnie Mouse <minnie@example.com>');
+        $this->assertSame($customer->get('name'), 'Minnie Mouse');
+        $this->assertSame($customer->get('email'), 'minnie@example.com');
     }
 
     /** @test */
     public function can_generate_title_and_slug_from_name_and_email()
     {
-        $repo = new CustomerRepository();
-        $repo->data['name'] = 'Duncan McClean';
-        $repo->data['email'] = 'duncan@doublethree.digital';
+        $customer = new CustomersCustomer(Entry::make()->collection('customers'));
 
-        $generate = $repo->generateTitleAndSlug();
+        $customer->set('name', 'Duncan McClean');
+        $customer->set('email', 'duncan@doublethree.digital');
+        $customer->save();
 
-        $this->assertSame($repo->title, 'Duncan McClean <duncan@doublethree.digital>');
-        $this->assertSame($repo->slug, 'duncan-at-doublethreedigital');
+        $generate = $customer->generateTitleAndSlug();
+
+        $this->assertSame($customer->title(), 'Duncan McClean <duncan@doublethree.digital>');
+        $this->assertSame($customer->slug(), 'duncan-at-doublethreedigital');
     }
 
     /** @test */
     public function can_generate_title_and_slug_from_just_email()
     {
-        $repo = new CustomerRepository();
-        $repo->data['email'] = 'james@example.com';
+        $customer = new CustomersCustomer(Entry::make()->collection('customers'));
 
-        $generate = $repo->generateTitleAndSlug();
+        $customer->set('email', 'james@example.com');
+        $customer->save();
 
-        $this->assertSame($repo->title, ' <james@example.com>');
-        $this->assertSame($repo->slug, 'james-at-examplecom');
+        $generate = $customer->generateTitleAndSlug();
+
+        $this->assertSame($customer->title(), ' <james@example.com>');
+        $this->assertSame($customer->slug(), 'james-at-examplecom');
     }
 }

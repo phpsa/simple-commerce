@@ -9,7 +9,6 @@ use DoubleThreeDigital\SimpleCommerce\Events\StockRunningLow;
 use DoubleThreeDigital\SimpleCommerce\Events\StockRunOut;
 use DoubleThreeDigital\SimpleCommerce\Exceptions\CustomerNotFound;
 use DoubleThreeDigital\SimpleCommerce\Exceptions\NoGatewayProvided;
-use DoubleThreeDigital\SimpleCommerce\Facades\Coupon;
 use DoubleThreeDigital\SimpleCommerce\Facades\Customer;
 use DoubleThreeDigital\SimpleCommerce\Facades\Gateway;
 use DoubleThreeDigital\SimpleCommerce\Facades\Product;
@@ -85,14 +84,16 @@ class CheckoutController extends BaseActionController
                 $customer = Customer::findByEmail($customerData['email']);
             } catch (CustomerNotFound $e) {
                 $customer = Customer::make()
-                    ->data([
-                        'name'  => isset($customerData['name']) ? $customerData['name'] : '',
-                        'email' => $customerData['email'],
-                    ])
+                    ->set('name', isset($customerData['name']) ? $customerData['name'] : '')
+                    ->set('email', $customerData['email'])
                     ->save();
             }
 
-            $customer->update($customerData);
+            foreach ($customerData as $key => $value) {
+                $customer->set($key, $value);
+            }
+
+            $customer->save();
 
             $this->cart->update([
                 'customer' => $customer->id,
